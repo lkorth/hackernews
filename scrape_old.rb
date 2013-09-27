@@ -2,7 +2,7 @@
 
 require "nokogiri"
 require "open-uri"
-load "link_thumbnailer_config.rb"
+load "config/link_thumbnailer_config.rb"
 load "story.rb"
 load "utils.rb"
 
