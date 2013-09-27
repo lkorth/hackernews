@@ -1,10 +1,10 @@
 # manually score stories as like or dislike, for use in building the model
-# "ruby judger.rb" to see unjudged stories 
+# "ruby judger.rb" to see unjudged stories
 # "ruby judger.rb word" to see all stories with "word" in their title
 
-require_relative "story"
-require_relative "model"
-require_relative "utils"
+require_relative "models/story"
+require_relative "models/model"
+require_relative "utils/utils"
 
 # unjudged stories, sorted by hnid descending
 total = Story.count
@@ -16,7 +16,7 @@ if ARGV.size > 0
   term = ARGV.first
   re = Regexp.new(term,true)
   stories = Story.where(:link_title => re).to_a.shuffle
-  
+
   puts "#{stories.count} stories containing #{term}"
 else
 
@@ -29,10 +29,11 @@ else
   puts
 end
 
-  
+
 stories.each do |s|
   puts "hnid: #{s.hnid}"
   puts "title: #{s.link_title}"
+  puts "summary: #{s.summary}"
   puts "domain: #{s.domain}"
   puts "url: #{s.link_url}"
   puts "user: #{s.user}"
@@ -49,13 +50,13 @@ stories.each do |s|
     s.like = false
   else break
   end
-  
+
   s.save
   puts
 end
 
 puts "retraining model"
-# after judging, retrain the model  
+# after judging, retrain the model
 model = Model.new
 model.train(2)
 model.save
@@ -65,4 +66,4 @@ model.save
 require_relative "back_predict"
 back_predict(false,false)
 
-require_relative "test_featurizer"  
+require_relative "test_featurizer"

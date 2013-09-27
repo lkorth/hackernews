@@ -1,12 +1,13 @@
 # post any new stories to blogger
 # using credentials from the yaml file .blogger in your home directory
 
-require 'twitter' 
+require 'twitter'
 require 'maruku'
-require_relative 'story'
-require_relative 'model'
 require "blogger"
 require "yaml"
+require "models/story.rb"
+require "models/model.rb"
+
 
 puts Time.now
 
@@ -63,7 +64,7 @@ post.content = content
 
 
 begin
-  
+
   account.post(blogid,post) if new_stories.size > 0
 
   new_stories.each do |s|
@@ -71,7 +72,7 @@ begin
     s.tweeted_at = Time.now
     s.save
   end
-  
+
 rescue Exception => e
   puts e.inspect
   puts new_stories.map{|s| s.link_title}.join("\n")

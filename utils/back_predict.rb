@@ -1,7 +1,7 @@
 # load the default model, and make predictions for every story in the database
 
-require_relative "story"
-require_relative "model"
+require_relative "../models/story"
+require_relative "../models/model"
 
 
 def back_predict(only_new = true,verbose=true)
@@ -9,13 +9,13 @@ def back_predict(only_new = true,verbose=true)
   model = Model.load
 
   stories = only_new ? Story.where( :prediction => nil ) : Story.all
-  
+
   puts "found #{stories.count} stories to classify"
-  
+
   stories.each do |story|
-    
+
     puts story.inspect if verbose
-    
+
     story.prediction = model.classify(story,verbose)
     story.save
   end
@@ -31,7 +31,7 @@ def worst_predictions(n = 25)
     puts s.prediction
     puts
   end
-  
+
   puts "worst false positives:"
   false_positives.each do |s|
     puts s.inspect
@@ -39,9 +39,9 @@ def worst_predictions(n = 25)
     puts
   end
 end
-  
+
 if __FILE__ == $PROGRAM_NAME
   back_predict
   worst_predictions
-end  
-    
+end
+

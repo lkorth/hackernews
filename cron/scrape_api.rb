@@ -3,9 +3,10 @@
 
 require 'open-uri'
 require 'json'
-require_relative "story"
-require_relative "utils"
-require_relative "model"
+require_relative '../config/link_thumbnailer_config'
+require_relative "../models/story"
+require_relative "../utils/utils"
+require_relative "../models/model"
 
 base_url = "http://news.ycombinator.com/newest"
 
@@ -21,11 +22,11 @@ def scrape(max_pages = 1, base_url)
   (1..max_pages).each do |i|
 
     puts "opening page #{i}: #{url}"
-    
+
     r = open(url).readline
-    
+
     puts "found #{r.size} characters"
-    
+
     doc = JSON.parse r
 
     nextId = doc["nextId"]
@@ -37,11 +38,18 @@ def scrape(max_pages = 1, base_url)
       if Story.where(:hnid => itemid).count > 0
         found_known_story = true
         puts "known story: #{itemid}"
-      else      
+      else
+        summary = ''
+        begin
+          LinkThumbnailer.generate(item["url"]).description
+        rescue
+        end
+
         story = Story.new
         story.hnid = itemid
         story.link_url = item["url"]
         story.link_title = item["title"]
+	      story.summary = summary
         story.domain = domain(item["url"])
         story.scraped_at = Time.now
         story.user = item["postedBy"]
@@ -49,14 +57,14 @@ def scrape(max_pages = 1, base_url)
         new_stories << story
       end
     end
-    
+
     break if found_known_story
     break unless nextId
 
     url = "#{base_url}/#{nextId}"
     puts "moving ahead to #{url}"
   end
-  
+
   puts "found #{new_stories.size} new stories"
   new_stories.each do |s|
     s.save
@@ -69,7 +77,7 @@ end
 
 
 begin
-  scrape(20,"http://api.ihackernews.com/new")
+  scrape(5,"http://api.ihackernews.com/page")
 rescue
-  puts "new failed, try again later"
+  puts "API failure, try again later"
 end

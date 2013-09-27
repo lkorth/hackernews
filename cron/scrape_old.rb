@@ -2,9 +2,9 @@
 
 require "nokogiri"
 require "open-uri"
-load "config/link_thumbnailer_config.rb"
-load "story.rb"
-load "utils.rb"
+require_relative "../config/link_thumbnailer_config"
+require_relative "../models/story"
+require_relative "../utils/utils"
 
 root_url = "http://www.daemonology.net/hn-daily" #2012-01.html"
 
