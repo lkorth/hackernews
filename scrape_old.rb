@@ -2,21 +2,23 @@
 
 require "nokogiri"
 require "open-uri"
+load "link_thumbnailer_config.rb"
 load "story.rb"
 load "utils.rb"
 
 root_url = "http://www.daemonology.net/hn-daily" #2012-01.html"
 
-def month_pages(root_url)
+def last_two_months_archive_pages(root_url)
   doc = Nokogiri::HTML(open(root_url))
   doc.xpath("//div[@class='marginlink']/a").to_a
             .map { |node| node["href"] }
             .select { |url| url =~ /[0-9]{4}\-[0-9]{2}\.html/ }
             .map { |url| "#{root_url}/#{url}" }
+            .first(2)
 end
 
 
-def scrape(url)
+def scrape_month_page(url)
   doc = Nokogiri::HTML(open(url))
 
   storylinks = doc.xpath("//li/span[@class='storylink']/a")
@@ -24,29 +26,45 @@ def scrape(url)
 
   if storylinks.size === commentlinks.size
     (storylinks.zip commentlinks).map do |sl,cl|
-      description = sl.text
+      title = sl.text
       url = sl["href"]
       hnurl = cl["href"]
 
-      [description,url,hnurl]
+      [url,hnurl,title]
     end
   end
 end
 
-month_pages(root_url).each do |url|
-  puts "scraping url"
-  scrape(url).each do |desc,url,hnurl|
-    puts desc
-    puts url
-    puts hnurl
+def scrape_story(url, hnurl, title)
+  summary = ''
+  begin
+    summary = LinkThumbnailer.generate(url).description
+  rescue
+  end
+
+  begin
     story = Story.new
-    story.hnid = hnid_from_url(hnurl)
     story.link_url = url
-    story.link_title = desc
     story.domain = domain(url)
+    story.hnid = hnid_from_url(hnurl)
+    story.link_title = title
+    story.summary = summary
     story.scraped_at = Time.now
-    puts "saving"
-    story.save   
+    story.save
+
+    puts story.link_url
+    puts story.domain
+    puts story.hnid
+    puts story.link_title
+    puts story.summary
     puts
+  rescue
+  end
+end
+
+last_two_months_archive_pages(root_url).each do |url|
+  puts "scraping month archive"
+  scrape_month_page(url).each do |url,hnurl,title|
+    scrape_story(url, hnurl, title)
   end
 end
