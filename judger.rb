@@ -33,6 +33,7 @@ end
 stories.each do |s|
   puts "hnid: #{s.hnid}"
   puts "title: #{s.link_title}"
+  puts "summary: #{s.summary}"
   puts "domain: #{s.domain}"
   puts "url: #{s.link_url}"
   puts "user: #{s.user}"

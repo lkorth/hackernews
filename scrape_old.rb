@@ -2,6 +2,7 @@
 
 require "nokogiri"
 require "open-uri"
+require "link_thumbnailer"
 load "story.rb"
 load "utils.rb"
 
@@ -43,10 +44,18 @@ month_pages(root_url).each do |url|
     story.hnid = hnid_from_url(hnurl)
     story.link_url = url
     story.link_title = desc
+    
+    begin
+        story.summary = LinkThumbnailer.generate(url).description
+    rescue
+    end    
+
     story.domain = domain(url)
     story.scraped_at = Time.now
     puts "saving"
     story.save   
     puts
   end
+
+  break
 end

@@ -10,6 +10,7 @@ class Story
   key :hnid, Integer
   key :link_url, String
   key :link_title, String
+  key :summary, String
   key :domain, String
   key :user, String
   

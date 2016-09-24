@@ -3,6 +3,7 @@
 
 require 'open-uri'
 require 'json'
+require 'link_thumbnailer'
 require_relative "story"
 require_relative "utils"
 require_relative "model"
@@ -41,7 +42,8 @@ def scrape(max_pages = 1, base_url)
         story = Story.new
         story.hnid = itemid
         story.link_url = item["url"]
-        story.link_title = item["title"]
+        story.link_title = item["title"]i
+	story.summary = domain(item"url")
         story.domain = domain(item["url"])
         story.scraped_at = Time.now
         story.user = item["postedBy"]
