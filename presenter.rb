@@ -12,7 +12,7 @@ def color_from_prob(p)
   return hex
 end
 
-new_stories = Story.where(:tweeted => nil).sort(:hnid.desc).take(10)
+new_stories = Story.where(:tweeted => nil).sort(:hnid.desc).take(50)
 
 puts "found #{new_stories.size} new stories"
 
@@ -24,8 +24,13 @@ sorted_stories = probs.zip(new_stories).sort{ |s1,s2| s2.first <=> s1.first }
 
 begin
   if sorted_stories.size > 0
+    puts
+    puts
+    puts
     puts "Hacker News stories for #{Time.now.strftime("%l %p on %A %b %d, %Y").strip}"
     puts
+
+    sorted_stories = sorted_stories.first(10)
 
     sorted_stories.map do |prob,s|
       #color = color_from_prob prob
@@ -33,13 +38,13 @@ begin
       hn_link = "http://news.ycombinator.com/item?id=#{s.hnid}"
       link = /^http/ =~ s.link_url ? s.link_url : hn_link
 
-      puts %Q[**#{sprintf("%.3f",prob)}** [#{title}](#{link}) [*comments*](#{hn_link})\n]
+      puts %Q[**#{sprintf("%.3f",prob)}** [#{title}](#{link})\n] # [*comments*](#{hn_link})\n]
     end
 
     new_stories.each do |s|
       s.tweeted = true
       s.tweeted_at = Time.now
-      s.save
+     # s.save
     end
   else
     puts "No new stories"

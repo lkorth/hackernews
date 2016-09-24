@@ -18,7 +18,11 @@ puts
 stories.each do |s|
   puts "hnid: #{s.hnid}"
   puts "title: #{s.link_title}"
-  puts "summary: #{s.summary[0, 180]}"
+
+  if s.summary
+    puts "summary: #{s.summary[0, 180]}"
+  end
+
   puts "domain: #{s.domain}"
   puts "url: #{s.link_url}"
   puts "user: #{s.user}"
@@ -48,7 +52,7 @@ model.save
 
 # and reclassify everything
 
-require_relative "../utils/back_predict"
+require_relative "utils/back_predict"
 back_predict(false,false)
 
-require_relative "../utils/test_featurizer"
+require_relative "utils/test_featurizer"
